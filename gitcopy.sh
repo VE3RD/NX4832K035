@@ -21,7 +21,8 @@ if [ -z "$1" ]; then
         echo "	 Valid Screens - EA7KDO) - NX3224K024, NX4832K035"
 	echo " " 
 	echo " 	Syntax: gitcopy.sh NX????K???   // Will copy EA7KDO Files - Default for Screen"
-	echo " 	Adding a second parameter(anything) will provide feedback as the script runs (Commandline)"
+	echo " 	Adding a either EA7KDO or VE3RD as a second  parameter will specify either EA7KDO or VE3RD Screen Set"
+	echo " 	Adding a third parameter(anything) will provide feedback as the script runs (Commandline)"
 	echo " "
 	exit
 fi
@@ -35,10 +36,13 @@ scn=$(echo "$1" | tr [:lower:] [:upper:])
 #tr [:lower:] [:upper:]
 scn="${scn:0:10}"
 
-#Feed back is off by default - Turn it on with anything as parameter  2
-fb="$2"
+#Feed back is off by default - Turn it on with anything as parameter 3
+fb="$3"
 #Set Call to EA7KDO
 calltxt="EA7KDO"
+if [ "$2" == "VE3RD ]; then
+calltxt="VE3RD
+fi
 
 #echo "$scn"
 
@@ -79,6 +83,33 @@ function getea7kdo
 	fi
 }
 
+# VE3RD Script Function
+function getve3rd
+{
+	tst=0
+#	echo "Function VE3RD"
+	calltxt="VE3RD"
+
+    	if [ "$scn" == "NX3224K024" ]; then
+
+		##  New Github Location  for the 24 inch screen - Remove the comment # when active
+	#	sudo git clone --depth 1 https://github.com/EA7KDO/NX3224K024 /home/pi-star/Nextion_Temp
+
+		### Old Github Location for the 24 ionch screen - Remove this line when the new location becomes active
+	  	sudo git clone --depth 1 https://github.com/VE3RD/Nextion /home/pi-star/Nextion
+		tst=1
+	fi     
+	if [ "$scn" == "NX4832K035" ]; then
+	  	sudo git clone --depth 1 https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp
+		tst=2
+     	fi
+	
+	if [ "$tst" == 0 ]; then
+		errtext="Invalid VE3RD Screen Name $scn"	
+		exitcode 
+	fi
+}
+
 
 #### Start of Main Code
 
@@ -86,11 +117,11 @@ function getea7kdo
 #echo "$scn  - $call" 
 if [ "$fb" ]; then
 	        if [ "$scn" != "$s1" -a "$scn" != "$s3" ]; then
-              		echo "EA7KDO Screen Name MUST be NX3224K024 or NX4832K035"
-                       	errtext="Invalid EA7KDO Screen Name"
+              		echo "Screen Name MUST be NX3224K024 or NX4832K035"
+                       	errtext="Invalid Screen Name"
                         exitcode
 		else
-			echo "Loading EA7KDO $scn Screen Package"
+			echo "Loading $scn Screen Package"
                 fi
 fi
 
