@@ -7,133 +7,129 @@
 #  and returns a script duration time to the Screen 	#
 #  as a script completion flag				#
 #							#
-#  KF6S/VE3RD                               2020-05-07  #
+#  KF6S/VE3RD                               2020=02-09  #
 #########################################################
 # Use screen model from command $1
 # Valid Screen Names for EA7KDO - NX3224K024, NX4832K935
+# Valid Screen Names for VE3RD - NX3224K024
+
 declare -i tst
 
 if [ -z "$1" ]; then
-	clear
-	echo ""
-	echo "  No Screen Name Provided"
-	echo
-        echo "	 Valid Screens - EA7KDO) - NX3224K024, NX4832K035"
-	echo " " 
-	echo " 	Syntax: gitcopy.sh NX????K???   // Will copy EA7KDO Files - Default for Screen"
-	echo " 	Adding a either EA7KDO or VE3RD as a second  parameter will specify either EA7KDO or VE3RD Screen Set"
-	echo " 	Adding a third parameter(anything) will provide feedback as the script runs (Commandline)"
-	echo " "
+	echo "No Screen Name Provided"
+	exit
+fi
+if [ -z "$2" ]; then
+	echo "No User Name Provided"
+	echo "User Name must EA7KDO or VE3RD"
 	exit
 fi
 
-s1="NX3224K024"
-s3="NX4832K035"
-errtext="Error! - Aborting"
 
-## Strip off .tft - Take only the first 10 characters
-scn=$(echo "$1" | tr [:lower:] [:upper:])
-#tr [:lower:] [:upper:]
+scn="$1"
 scn="${scn:0:10}"
 
-#Feed back is off by default - Turn it on with anything as parameter 3
+if [ "$2" == "EA7KDO" ] || [ "$2" == "ea7kdo" ]; then
+	calls="EA7KDO"
+fi 
+if [ "$2" == "VE3RD" ] || [ "$2" == "ve3rd" ]; then
+	calls="VE3RD"
+fi 
+
 fb="$3"
-#Set Call to EA7KDO
-calltxt="EA7KDO"
-if [ "$2" == "VE3RD ]; then
-calltxt="VE3RD
-fi
 
 #echo "$scn"
 
-## Programmed Shutdown
+
 function exitcode
 {
-	echo "Script Execution Failed "
 	echo "$scn"
-	echo "$errtext"
+	echo "Program Execution Halted"
 	exit
 
 }
 
-# EA7KDO Script Function
 function getea7kdo
 {
-	tst=0
 #	echo "Function EA7KDO"
-	calltxt="EA7KDO"
 
-    	if [ "$scn" == "NX3224K024" ]; then
-
-		##  New Github Location  for the 24 inch screen - Remove the comment # when active
-	#	sudo git clone --depth 1 https://github.com/EA7KDO/NX3224K024 /home/pi-star/Nextion_Temp
-
-		### Old Github Location for the 24 ionch screen - Remove this line when the new location becomes active
+    	if [ "$scn" = "NX3224K024" ]; then
 	  	sudo git clone --depth 1 https://github.com/EA7KDO/Nextion.Images /home/pi-star/Nextion_Temp
+		cp /home/pi-star/Nextion_Temp/NX3224K024.tft /usr/local/etc/
 		tst=1
 	fi     
-	if [ "$scn" == "NX4832K035" ]; then
+	if [ "$scn" = "NX4832K035" ]; then
 	  	sudo git clone --depth 1 https://github.com/EA7KDO/NX4832K035 /home/pi-star/Nextion_Temp
+		cp /home/pi-star/Nextion_Temp/NX4832K035.tft /usr/local/etc/
 		tst=2
      	fi
 	
-	if [ "$tst" == 0 ]; then
-		errtext="Invalid EA7KDO Screen Name $scn"	
-		exitcode 
+	if [ "$tst" = 0 ]; then
+		exitcode "Invalid EA7KDO Screen Name $scn"
 	fi
 }
 
-# VE3RD Script Function
 function getve3rd
 {
-	tst=0
 #	echo "Function VE3RD"
-	calltxt="VE3RD"
+     	                if [ "$fb" ]; then
+                        echo "Starting GetVe3rd Function"
+                fi
+	if [ "$scn" = "NX3224K024" ]; then	
+		if [ -d /home/pi-star/Nextion_Temp ]; then
+			rm -r /home/pi-star/Nextion_Temp
+		fi
+  	  	sudo git clone --depth 1 https://github.com/VE3RD/Nextion /home/pi-star/Nextion_Temp 
+		cp /home/pi-star/Nextion/NX3224K024.tft /usr/local/etc/
 
-    	if [ "$scn" == "NX3224K024" ]; then
+	elif [ "$scn" = "NX4832K035" ]; then	
+		if [ -d /home/pi-star/Nextion_Temp ]; then
+			rm -r /home/pi-star/Nextion_Temp
+		fi
+  	  	sudo git clone --depth 1 https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp 
+		cp /home/pi-star/Nextion_Temp/NX4832K035.tft /usr/local/etc/
 
-		##  New Github Location  for the 24 inch screen - Remove the comment # when active
-	#	sudo git clone --depth 1 https://github.com/EA7KDO/NX3224K024 /home/pi-star/Nextion_Temp
-
-		### Old Github Location for the 24 ionch screen - Remove this line when the new location becomes active
-	  	sudo git clone --depth 1 https://github.com/VE3RD/Nextion /home/pi-star/Nextion
-		tst=1
-	fi     
-	if [ "$scn" == "NX4832K035" ]; then
-	  	sudo git clone --depth 1 https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp
-		tst=2
-     	fi
-	
-	if [ "$tst" == 0 ]; then
-		errtext="Invalid VE3RD Screen Name $scn"	
-		exitcode 
+          else
+		exitcode "Invalid VE3RD Screen Name $scn"
 	fi
+                if [ "$fb" ]; then
+                        echo "VE3RD Files git Completed"
+                fi
+
 }
 
 
-#### Start of Main Code
-
-
-#echo "$scn  - $call" 
-if [ "$fb" ]; then
-	        if [ "$scn" != "$s1" -a "$scn" != "$s3" ]; then
-              		echo "Screen Name MUST be NX3224K024 or NX4832K035"
-                       	errtext="Invalid Screen Name"
-                        exitcode
-		else
-			echo "Loading $scn Screen Package"
-                fi
+if [ -z "$1" ]; then
+	echo " Syntax: gitcopy.sh NX????K???   // Will copy EA7KDO Files - Default"
+	echo " Syntax: gitcopy.sh NX????K??? EA7KDO // Will copy EA7KDO Files - Selected"
+	echo " Syntax: gitcopy.sh NX????K??? VE3RD // Will copy VE3RD Files - Selected"
+	echo " Adding a third parameter(anything) will provide feedback as the script runs (Commandline)"
+	echo " " 
 fi
 
-#echo " End Processing Parameters  - $scn $call"
+if [ "$fb" ]; then
+	if [ "$calls" == "EA7KDO" ]; then
+	 	echo "Loading EA7KDO $scn Screen Package"
+	fi
+	if [ "$calls" == "VE3RD" ]; then
+                if [ ! "$scn" = "NX3224K024" ]; then
+			echo "Loading VE3RD $scn Screen Package"
+		fi	
+	fi
+fi
 
-if [ ! -d /home/pi-star/Nextion_Temp ]; then
-   sudo mkdir /home/pi-star/Nextion_Temp
+if [ "$call" = "VE3RD" ]; then
+     	if [ "$scn" != "NX3224K024" ]; then
+		if [ "$fb" ]; then
+			scn="NX3224K024"
+			echo "VE3RD Screen Name MUST be NX3224K024"
+			echo "Revising Screen Name to Match VE3RD Screens"
+		fi
+	fi
 fi
 
 #Start Duration Timer
 start=$(date +%s.%N)
-
 
 #Disable all command feedback
 if [ ! "$fb" ]; then
@@ -142,8 +138,7 @@ if [ ! "$fb" ]; then
 fi
 
 model="$scn"
-tft='.tft' 
-#gz='.gz'
+tft='.tft' gz='.gz'
 #Put Pi-Star file system in RW mode
 sudo mount -o remount,rw /
 sleep 1s
@@ -164,45 +159,71 @@ fi
   # Get EA7KDO File Set
 
 tst=0
-
-getea7kdo
+if [ "$calls" = "EA7KDO" ]; then
+	getea7kdo
  
-
-
-if [ ! -d /usr/local/etc/Nextion_Support ]; then
-	sudo mkdir /usr/local/etc/Nextion_Support
-else
-       sudo rm /usr/local/etc/Nextion_Support/*
 fi
 
-sudo chmod +x /home/pi-star/Nextion_Temp/*.sh
-sudo rsync -avqru /home/pi-star/Nextion_Temp/* /usr/local/etc/Nextion_Support/ --exclude=NX* --exclude=profiles.txt
 
-if [ -f /home/pi-star/Nextion_Temp/profiles.txt ]; then
-	if [ ! -f /usr/local/etc/Nextion_Support/profiles.txt ]; then
-        	if [ "$fb" ]; then
-                	echo "Replacing Missing Profiles.txt"
-        	fi
-        	sudo cp  /home/pi-star/Nextion_Temp/profiles.txt /usr/local/etc/Nextion_Support/
-	fi
+  # Get VE3RD File Set
+if [ "$calls" = "VE3RD" ]; then
+	getve3rd
 fi
 
-model="$scn"
+if [ -d /usr/local/etc/Nextion_Support ]; then
+	sudo rm -r /usr/local/etc/Nextion_Support
+                if [ "$fb" ]; then
+                        echo "Removing Nextion_Support Directory"
+                fi
+	
+fi
+
+sudo mkdir /usr/local/etc/Nextion_Support
+                if [ "$fb" ]; then
+                        echo "Creating Nextion_Support Directory"
+                fi
+
 if [ "$fb" ]; then
-    echo "Remove Existing $model$tft and copy in the new one"
+    echo "Remove Existing $model$tft"
 fi
 
 if [ -f /usr/local/etc/$model$tft ]; then
-	sudo rm /usr/local/etc/NX*.tft
+	sudo rm /usr/local/etc/$model$tft
 fi
-sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
 
+if [ "$calls" == "EA7KDO" ]; then
+	sudo chmod +x /home/pi-star/Nextion_Temp/*.sh
+	sudo rsync -avqru /home/pi-star/Nextion_Temp/* /usr/local/etc/Nextion_Support/ --exclude=NX* --exclude=profiles.txt
+	sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
+                if [ "$fb" ]; then
+                        echo "New $model$tft Copied to /usr/local/etc/"
+                fi
+	sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
+	
+fi
+if [ "$calls" == "VE3RD" ]; then
+	sudo chmod +x /home/pi-star/Nextion_Temp/*.sh
+	sudo rsync -avqru /home/pi-star/Nextion_Temp/* /usr/local/etc/Nextion_Support/ --exclude=NX* --exclude=profiles.txt
+	if [ -f /home/pi-star/Nextion_Temp/profiles.txt ]; then
+		if [ ! -f /usr/local/etc/Nextion_Support/profiles.txt ]; then
+        		if [ "$fb" ]; then
+                		echo "Replacing Missing Profiles.txt"
+        		fi
+        		sudo cp  /home/pi-star/Nextion_Temp/profiles.txt /usr/local/etc/Nextion_Support/
+		fi
+                if [ "$fb" ]; then
+                        echo "New $model$tft Copied to /usr/local/etc/"
+                fi
+
+	fi
+	sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
+	
+fi
 
  FILE=/usr/local/etc/$model$tft
  if [ ! -f "$FILE" ]; then
         # Copy failed
-      echo "No TFT File Available to Flash - Try Again"
-	errtext="Missing tft File Parameter"
+      echo "No TFT File $model$tft Available to Flash - Try Again"
 	exitcode
  fi
 
@@ -215,7 +236,7 @@ if [ ! "$fb" ]; then
  exec 2>&3
 fi 
 
-echo "$calltxt Scripts Loaded: $execution_time"
+echo "$scn Loaded: $execution_time"
 
 
 
