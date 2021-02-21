@@ -10,7 +10,7 @@
 set -o errexit
 set -o pipefail
 echo "Load Test Color Set $1" > /home/pi-star/LoadTest.txt
-
+sudo mount -o remount,rw /
 dirn=/usr/local/etc/Nextion_Support/ColorDB.txt
 
                 m1=$(sed -nr "/^\[Set $1\]/ { :l /^tbc1bco[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" $dirn)
@@ -44,3 +44,4 @@ echo "$m1|$m2|$m3|$m4|$m5|$m6|$m7|$m8|$m9|$m10|$m11|$m12|$m13|$m14|$m15|$m16|$m1
 echo "$m1|$m2|$m3|$m4|$m5|$m6|$m7|$m8|$m9|$m10|$m11|$m12|$m13|$m14|$m15|$m16|$m17|$m18|$m19|$m20|$m21|$m22|$m23|$m24|" >> /home/pi-star/LoadTest.txt
 
 
+sudo mount -o remount,ro /
