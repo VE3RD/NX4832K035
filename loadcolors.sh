@@ -11,7 +11,7 @@ set -o errexit
 set -o pipefail
 echo "Load Test Color Set $1" > /home/pi-star/LoadTest.txt
 
-dirn=/home/pi-star/ColorDB.txt
+dirn=/usr/local/etc/Nextion_Support/ColorDB.txt
 
                 m1=$(sed -nr "/^\[Set $1\]/ { :l /^tbc1bco[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" $dirn)
                 m2=$(sed -nr "/^\[Set $1\]/ { :l /^tbc1pco[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" $dirn)

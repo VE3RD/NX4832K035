@@ -11,7 +11,7 @@
 set -o errexit
 set -o pipefail
 
-sudo sed -nr "/^\[Default\]/ { :l /^ColorSet[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" /home/pi-star/ColorDB.txt
+sudo sed -nr "/^\[Default\]/ { :l /^ColorSet[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" /usr/local/etc/Nextion_Support/ColorDB.txt
 
 
 

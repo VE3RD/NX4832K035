@@ -14,7 +14,7 @@ set -o pipefail
 sudo mount -o remount,rw /
 echo "Load Test Color Set $1 Group $2" > /home/pi-star/LoadTest.txt
 
-dirn=/home/pi-star/ColorDB.txt
+dirn=/usr/local/etc/Nextion_Support/ColorDB.txt
 if [ "$2" = "1" ]; then
 
                 m1=$(sed -nr "/^\[Set $1\]/ { :l /^tbc1bco[ ]*=/ { s/.*=[ ]*//; p; q;}; n; b l;}" $dirn)

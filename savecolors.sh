@@ -9,7 +9,7 @@
 set -o errexit
 set -o pipefail
 sudo mount -o remount,rw /
-dirn=/home/pi-star/ColorDB.txt
+dirn=/usr/local/etc/Nextion_Support/ColorDB.txt
 echo "$1 $2" > /home/pi-star/Test.txt
 
 m1=$(echo "$1" | cut -d '/' -f 1)
@@ -19,6 +19,7 @@ echo "$m2" >> /home/pi-star/Test.txt
 m3=$(echo "$1" | cut -d '/' -f 3)
 echo "$m3" >> /home/pi-star/Test.txt
 m4=$(echo "$1" | cut -d'/' -f4)
+echo "$m4" >> /home/pi-star/Test.txt
 m5=$(echo "$1" | cut -d'/' -f5)
 m6=$(echo "$1" | cut -d'/' -f6)
 m7=$(echo "$1" | cut -d'/' -f7)
@@ -40,6 +41,8 @@ m22=$(echo "$1" | cut -d'/' -f22)
 m23=$(echo "$1" | cut -d'/' -f23)
 m24=$(echo "$1" | cut -d'/' -f24)
 m25=$(echo "$1" | cut -d'/' -f25)
+
+echo "$m1:$m2|$m3:$m4|$m5:$m6" > /home/pi-star/savetest.txt
 
 
   sudo sed -i '/^\[/h;G;/Set '"$1"'/s/\(tbc1bco=\).*/\1'"$m2"'/m;P;d' $dirn
@@ -67,7 +70,6 @@ m25=$(echo "$1" | cut -d'/' -f25)
   sudo sed -i '/^\[/h;G;/Set '"$1"'/s/\(tbc12bco=\).*/\1'"$m24"'/m;P;d' $dirn
   sudo sed -i '/^\[/h;G;/Set '"$1"'/s/\(tbc12pco=\).*/\1'"$m25"'/m;P;d' $dirn
 	
-
 echo "Saved CS"
 sudo mount -o remount,ro /
 
