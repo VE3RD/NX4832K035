@@ -8,7 +8,7 @@ sudo rm -f /usr/local/etc/NX4832K035.tft
 
 sudo rm -r -f /home/pi-star/Nextion_Temp
 
-sudo git clone https://github.com/EA7KDO/NX4832K035 /home/pi-star/Nextion_Temp
+sudo git clone https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp
 (Note: There is a single space after NX4832K035 in the command line.)
 
 sudo cp /home/pi-star/Nextion_Temp/NX4832K035.tft /usr/local/etc/NX4832K035.tft
