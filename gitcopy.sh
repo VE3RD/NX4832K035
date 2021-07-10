@@ -10,8 +10,8 @@
 #  KF6S/VE3RD                               2020=02-09  #
 #########################################################
 # Use screen model from command $1
-# Valid Screen Names for EA7KDO - NX3224K024, NX4832K935
-# Valid Screen Names for VE3RD - NX3224K024
+# Valid Screen Names for EA7KDO - NX3224K024, NX4832K035
+# Valid Screen Names for VE3RD - NX3224K024, NX4832K035
 
 declare -i tst
 
@@ -55,18 +55,16 @@ function getea7kdo
 
     	if [ "$scn" = "NX3224K024" ]; then
 	  	sudo git clone --depth 1 https://github.com/EA7KDO/Nextion.Images /home/pi-star/Nextion_Temp
-		cp /home/pi-star/Nextion_Temp/NX3224K024.tft /usr/local/etc/
 		tst=1
 	fi     
 	if [ "$scn" = "NX4832K035" ]; then
 	  	sudo git clone --depth 1 https://github.com/EA7KDO/NX4832K035 /home/pi-star/Nextion_Temp
-		cp /home/pi-star/Nextion_Temp/NX4832K035.tft /usr/local/etc/
 		tst=2
      	fi
-	
 	if [ "$tst" = 0 ]; then
 		exitcode "Invalid EA7KDO Screen Name $scn"
 	fi
+	
 }
 
 function getve3rd
@@ -76,25 +74,18 @@ function getve3rd
                         echo "Starting GetVe3rd Function"
                 fi
 	if [ "$scn" = "NX3224K024" ]; then	
-		if [ -d /home/pi-star/Nextion_Temp ]; then
-			rm -r /home/pi-star/Nextion_Temp
-		fi
-  	  	sudo git clone --depth 1 https://github.com/VE3RD/Nextion /home/pi-star/Nextion_Temp 
-		cp /home/pi-star/Nextion/NX3224K024.tft /usr/local/etc/
+	  	sudo git clone --depth 1 https://github.com/VE3RD/Nextion /home/pi-star/Nextion
+		tst=1
+	fi     
+	if [ "$scn" = "NX4832K035" ]; then	
+	  	sudo git clone --depth 1 https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp
+		tst=2
+	fi     
 
-	elif [ "$scn" = "NX4832K035" ]; then	
-		if [ -d /home/pi-star/Nextion_Temp ]; then
-			rm -r /home/pi-star/Nextion_Temp
-		fi
-  	  	sudo git clone --depth 1 https://github.com/VE3RD/NX4832K035 /home/pi-star/Nextion_Temp 
-		cp /home/pi-star/Nextion_Temp/NX4832K035.tft /usr/local/etc/
-
-          else
+	if [ "$tst" = 0 ]; then
 		exitcode "Invalid VE3RD Screen Name $scn"
 	fi
-                if [ "$fb" ]; then
-                        echo "VE3RD Files git Completed"
-                fi
+
 
 }
 
@@ -112,19 +103,7 @@ if [ "$fb" ]; then
 	 	echo "Loading EA7KDO $scn Screen Package"
 	fi
 	if [ "$calls" == "VE3RD" ]; then
-                if [ ! "$scn" = "NX3224K024" ]; then
-			echo "Loading VE3RD $scn Screen Package"
-		fi	
-	fi
-fi
-
-if [ "$call" = "VE3RD" ]; then
-     	if [ "$scn" != "NX3224K024" ]; then
-		if [ "$fb" ]; then
-			scn="NX3224K024"
-			echo "VE3RD Screen Name MUST be NX3224K024"
-			echo "Revising Screen Name to Match VE3RD Screens"
-		fi
+		echo "Loading VE3RD $scn Screen Package"
 	fi
 fi
 
@@ -187,8 +166,8 @@ if [ "$fb" ]; then
     echo "Remove Existing $model$tft"
 fi
 
-if [ -f /usr/local/etc/$model$tft ]; then
-	sudo rm /usr/local/etc/$model$tft
+if [ -f /usr/local/etc/"$model$tft" ]; then
+	sudo rm /usr/local/etc/"$model$tft"
 fi
 
 if [ "$calls" == "EA7KDO" ]; then
@@ -198,32 +177,44 @@ if [ "$calls" == "EA7KDO" ]; then
                 if [ "$fb" ]; then
                         echo "New $model$tft Copied to /usr/local/etc/"
                 fi
-	sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
 	
 fi
 if [ "$calls" == "VE3RD" ]; then
-	sudo chmod +x /home/pi-star/Nextion_Temp/*.sh
-	sudo rsync -avqru /home/pi-star/Nextion_Temp/* /usr/local/etc/Nextion_Support/ --exclude=NX* --exclude=profiles.txt
-	if [ -f /home/pi-star/Nextion_Temp/profiles.txt ]; then
-		if [ ! -f /usr/local/etc/Nextion_Support/profiles.txt ]; then
-        		if [ "$fb" ]; then
-                		echo "Replacing Missing Profiles.txt"
-        		fi
-        		sudo cp  /home/pi-star/Nextion_Temp/profiles.txt /usr/local/etc/Nextion_Support/
+        if [ "$scn" == "NX3224K024" ]; then
+		sudo chmod +x /home/pi-star/Nextion/*.sh
+		sudo rsync -avqru /home/pi-star/Nextion/* /usr/local/etc/Nextion_Support/ --exclude=NX* --exclude=profiles.txt
+		sudo cp /home/pi-star/Nextion/$model$tft /usr/local/etc/
+		if [ -f /home/pi-star/Nextion/profiles.txt ]; then
+			if [ ! -f /usr/local/etc/Nextion_Support/profiles.txt ]; then
+        			if [ "$fb" ]; then
+                			echo "Replacing Missing Profiles.txt"
+        			fi
+        			sudo cp  /home/pi-star/Nextion/profiles.txt /usr/local/etc/Nextion_Support/
+			fi
+			sudo cp /home/pi-star/Nextion/$model$tft /usr/local/etc/
+                	if [ "$fb" ]; then
+                        	echo "New $model$tft Copied to /usr/local/etc/"
+                	fi
 		fi
-                if [ "$fb" ]; then
-                        echo "New $model$tft Copied to /usr/local/etc/"
-                fi
+
 
 	fi
-	sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
+        if [ "$scn" == "NX4832K035" ]; then
+		sudo chmod +x /home/pi-star/Nextion_Temp/*.sh
+		sudo rsync -avqru /home/pi-star/Nextion_Temp/* /usr/local/etc/Nextion_Support/ 
+   		sudo cp /home/pi-star/Nextion_Temp/$model$tft /usr/local/etc/
+             
+		if [ "$fb" ]; then
+                       	echo "New $model$tft Copied to /usr/local/etc/"
+               	fi
+
+	fi
 	
 fi
 
- FILE=/usr/local/etc/$model$tft
- if [ ! -f "$FILE" ]; then
+ if [ ! -f "/usr/local/etc/$model$tft" ]; then
         # Copy failed
-      echo "No TFT File $model$tft Available to Flash - Try Again"
+      echo "TFT $model$tft Not Found - No TFT File Available to Flash - Try Again"
 	exitcode
  fi
 
